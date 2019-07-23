@@ -1,6 +1,6 @@
-package scenes.main;
+package scenes.history;
 
-public interface MainContractor {
+public interface HistoryContractor {
     interface View {
 
     }
