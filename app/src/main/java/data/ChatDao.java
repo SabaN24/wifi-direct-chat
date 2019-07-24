@@ -22,4 +22,7 @@ public interface ChatDao {
     @Query("DELETE FROM chat where id = :id")
     void deleteChat(int id);
 
+    @Query("DELETE FROM chat")
+    void deleteAllChats();
+
 }

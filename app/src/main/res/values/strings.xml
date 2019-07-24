@@ -11,4 +11,9 @@
     <string name="history">ისტორია</string>
     <string name="chat">ჩატი</string>
     <string name="empty">---</string>
+    <string name="clearHistory">ისტორიის გასუფთავება</string>
+    <string name="confirmClearHistory">გსურთ \'%1$s\'-თან მიმოწერის წაშლა?</string>
+    <string name="yes">დიახ</string>
+    <string name="no">არა</string>
+    <string name="confirm">დადასტურება</string>
 </resources>

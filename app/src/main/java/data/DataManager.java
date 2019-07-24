@@ -34,6 +34,10 @@ public class DataManager {
         Database.getInstance().chatDao().deleteChat(chatId);
     }
 
+    public static void deleteAllChats() {
+        Database.getInstance().chatDao().deleteAllChats();
+    }
+
     public static List<MessageModel> getChatMessages(int chatId) {
         List<MessageModel> result = new ArrayList<>();
         List<MessageEntity> entities = Database.getInstance().messageDao().getChatMessages(chatId);
