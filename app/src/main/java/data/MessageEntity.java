@@ -23,13 +23,17 @@ public class MessageEntity {
     @ColumnInfo(name = "time")
     private Long time;
 
+    @ColumnInfo(name = "response")
+    private boolean response;
+
     @ColumnInfo(name = "chat_id")
     private int chatId;
 
-    public MessageEntity(int id, String text, Long time, int chatId) {
+    public MessageEntity(int id, String text, Long time, boolean response, int chatId) {
         this.id = id;
         this.text = text;
         this.time = time;
+        this.response = response;
         this.chatId = chatId;
     }
 
@@ -55,6 +59,14 @@ public class MessageEntity {
 
     public void setTime(Long time) {
         this.time = time;
+    }
+
+    public boolean isResponse() {
+        return response;
+    }
+
+    public void setResponse(boolean response) {
+        this.response = response;
     }
 
     public int getChatId() {

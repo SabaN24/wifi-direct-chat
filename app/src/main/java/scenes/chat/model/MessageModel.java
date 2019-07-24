@@ -10,12 +10,15 @@ public class MessageModel {
 
     private Date time;
 
+    private boolean response;
+
     private int chatId;
 
-    public MessageModel(int id, String text, Date time, int chatId) {
+    public MessageModel(int id, String text, Date time, boolean response, int chatId) {
         this.id = id;
         this.text = text;
         this.time = time;
+        this.response = response;
         this.chatId = chatId;
     }
 
@@ -41,6 +44,14 @@ public class MessageModel {
 
     public void setTime(Date time) {
         this.time = time;
+    }
+
+    public boolean isResponse() {
+        return response;
+    }
+
+    public void setResponse(boolean response) {
+        this.response = response;
     }
 
     public int getChatId() {

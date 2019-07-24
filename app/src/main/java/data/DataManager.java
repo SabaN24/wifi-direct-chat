@@ -38,13 +38,13 @@ public class DataManager {
         List<MessageModel> result = new ArrayList<>();
         List<MessageEntity> entities = Database.getInstance().messageDao().getChatMessages(chatId);
         for (MessageEntity entity : entities) {
-            result.add(new MessageModel(entity.getId(), entity.getText(), DateConverter.toDate(entity.getTime()), entity.getChatId()));
+            result.add(new MessageModel(entity.getId(), entity.getText(), DateConverter.toDate(entity.getTime()), entity.isResponse(), entity.getChatId()));
         }
         return result;
     }
 
     public static void updateMessage(MessageModel message) {
-        MessageEntity entity = new MessageEntity(message.getId(), message.getText(), DateConverter.fromDate(message.getTime()), message.getChatId());
+        MessageEntity entity = new MessageEntity(message.getId(), message.getText(), DateConverter.fromDate(message.getTime()), message.isResponse(), message.getChatId());
         Database.getInstance().messageDao().updateMessage(entity);
     }
 
