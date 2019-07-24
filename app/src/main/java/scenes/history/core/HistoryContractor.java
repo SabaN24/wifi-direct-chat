@@ -1,4 +1,4 @@
-package scenes.history;
+package scenes.history.core;
 
 public interface HistoryContractor {
     interface View {

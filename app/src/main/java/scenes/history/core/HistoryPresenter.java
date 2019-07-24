@@ -1,4 +1,4 @@
-package scenes.history;
+package scenes.history.core;
 
 public class HistoryPresenter implements HistoryContractor.Presenter {
 
