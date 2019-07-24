@@ -15,7 +15,7 @@ import android.view.MenuItem;
 
 import com.saba.wifidirectchat.R;
 
-import scenes.chat.ChatFragment;
+import scenes.chat.core.ChatFragment;
 import scenes.history.core.HistoryFragment;
 
 public class NavigationDrawerActivity extends AppCompatActivity

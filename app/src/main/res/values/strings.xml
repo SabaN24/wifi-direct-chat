@@ -10,4 +10,5 @@
 
     <string name="history">ისტორია</string>
     <string name="chat">ჩატი</string>
+    <string name="empty">---</string>
 </resources>

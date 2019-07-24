@@ -1,4 +1,4 @@
-package scenes.chat;
+package scenes.chat.core;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,7 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.saba.wifidirectchat.R;
 
-public class ChatFragment extends Fragment {
+public class ChatFragment extends Fragment
+                          implements ChatContractor.View {
+
+    private ChatContractor.Presenter presenter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -19,6 +22,8 @@ public class ChatFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // TODO
+        presenter = new ChatPresenter(this);
+
+        presenter.start();
     }
 }

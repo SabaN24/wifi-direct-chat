@@ -1,4 +1,4 @@
-package scenes.chat;
+package scenes.chat.model;
 
 import java.util.Date;
 
