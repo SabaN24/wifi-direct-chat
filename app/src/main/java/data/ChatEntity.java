@@ -16,6 +16,12 @@ public class ChatEntity {
     @ColumnInfo(name = "time")
     private Long time;
 
+    public ChatEntity(int id, String deviceName, Long time) {
+        this.id = id;
+        this.deviceName = deviceName;
+        this.time = time;
+    }
+
     public int getId() {
         return id;
     }

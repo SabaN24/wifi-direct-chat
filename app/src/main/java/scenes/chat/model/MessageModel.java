@@ -12,6 +12,13 @@ public class MessageModel {
 
     private int chatId;
 
+    public MessageModel(int id, String text, Date time, int chatId) {
+        this.id = id;
+        this.text = text;
+        this.time = time;
+        this.chatId = chatId;
+    }
+
     public int getId() {
         return id;
     }

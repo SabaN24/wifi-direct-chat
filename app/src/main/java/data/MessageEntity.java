@@ -26,6 +26,13 @@ public class MessageEntity {
     @ColumnInfo(name = "chat_id")
     private int chatId;
 
+    public MessageEntity(int id, String text, Long time, int chatId) {
+        this.id = id;
+        this.text = text;
+        this.time = time;
+        this.chatId = chatId;
+    }
+
     public int getId() {
         return id;
     }
