@@ -10,16 +10,16 @@ import java.util.List;
 @Dao
 public interface MessageDao {
 
-    @Query("SELECT * FROM message where chat_id = id")
+    @Query("SELECT * FROM message where chat_id = :id")
     List<MessageEntity> getChatMessages(int id);
 
-    @Query("SELECT COUNT(*) FROM message where chat_id = id")
+    @Query("SELECT COUNT(*) FROM message where chat_id = :id")
     int getChatMessagesCount(int id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void updateMessage(MessageEntity message);
 
-    @Query("DELETE FROM message where chat_id = id")
+    @Query("DELETE FROM message where chat_id = :id")
     void deleteChatMessages(int id);
 
 }
