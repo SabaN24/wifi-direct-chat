@@ -29,7 +29,7 @@ public class ChatsRecyclerViewAdapter extends RecyclerView.Adapter {
 
     private HistoryContractor.Presenter presenter;
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd - hh:mm:ss", Locale.US);
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy - hh:mm:ss", Locale.US);
 
     public ChatsRecyclerViewAdapter(Context context, HistoryContractor.Presenter presenter) {
         super();
@@ -72,7 +72,7 @@ public class ChatsRecyclerViewAdapter extends RecyclerView.Adapter {
                                 presenter.removeChatButtonClicked(chat.getId());
                             }
                         })
-                        .setNegativeButton(v.getContext().getResources().getString(R.string.yes), null).show();
+                        .setNegativeButton(v.getContext().getResources().getString(R.string.no), null).show();
                 return true;
             }
         });
@@ -86,7 +86,9 @@ public class ChatsRecyclerViewAdapter extends RecyclerView.Adapter {
 
         holder.chatDeviceName.setText(chat.getDeviceName());
         holder.chatTime.setText(sdf.format(chat.getTime()));
-        holder.chatMessagesCount.setText(chat.getMessagesCount());
+
+        String count = chat.getMessagesCount() + "";
+        holder.chatMessagesCount.setText(count);
     }
 
     @Override

@@ -35,7 +35,9 @@ public class ChatPresenter implements ChatContractor.Presenter {
     @Override
     public void btnSendTapped(String text) {
         text = text.trim();
-        if(text.isEmpty()) { return; }
+        if(text.isEmpty()) {
+            return;
+        }
         MessageModel newMessage = new MessageModel(0, text, new Date(), false, chatId);
         DataManager.updateMessage(newMessage);
         view.sendMessage(text);

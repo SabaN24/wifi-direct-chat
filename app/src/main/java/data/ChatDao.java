@@ -17,7 +17,7 @@ public interface ChatDao {
     ChatEntity getChatById(int id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void updateChat(ChatEntity chat);
+    long updateChat(ChatEntity chat);
 
     @Query("DELETE FROM chat where id = :id")
     void deleteChat(int id);

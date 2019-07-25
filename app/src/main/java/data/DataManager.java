@@ -26,8 +26,7 @@ public class DataManager {
 
     public static ChatModel updateChat(ChatModel chat) {
         ChatEntity entity = new ChatEntity(chat.getId(), chat.getDeviceName(), DateConverter.fromDate(chat.getTime()));
-        Database.getInstance().chatDao().updateChat(entity);
-        chat.setId(entity.getId());
+        chat.setId((int) Database.getInstance().chatDao().updateChat(entity));
         return chat;
     }
 

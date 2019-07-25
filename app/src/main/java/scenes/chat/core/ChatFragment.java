@@ -15,7 +15,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -151,7 +150,7 @@ public class ChatFragment extends Fragment
 
     @Override
     public void sendMessage(String text) {
-        pipe.write(text.getBytes());
+//        pipe.write(text.getBytes());
     }
 
     @Override

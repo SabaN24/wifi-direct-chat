@@ -63,7 +63,7 @@ public class HistoryFragment extends Fragment
             view.findViewById(R.id.clearHistoryButton).setVisibility(View.VISIBLE);
             view.findViewById(R.id.noChatsText).setVisibility(View.INVISIBLE);
         }
-        String title = getString(R.string.history) + (chats.isEmpty() ? "" : ("(" + chats.size() + ")"));
+        String title = getString(R.string.history) + (chats.isEmpty() ? "" : (" (" + chats.size() + ")"));
         Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setTitle(title);
     }
 
