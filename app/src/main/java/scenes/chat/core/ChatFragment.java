@@ -2,6 +2,9 @@ package scenes.chat.core;
 
 import android.content.Context;
 import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +21,7 @@ import android.widget.EditText;
 
 import com.saba.wifidirectchat.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import p2p.WiFiDirectBroadcastReceiver;
@@ -32,6 +37,8 @@ public class ChatFragment extends Fragment
     private WifiP2pManager manager;
     private WifiP2pManager.Channel channel;
     private WiFiDirectBroadcastReceiver receiver;
+    private WifiP2pManager.PeerListListener peerListListener;
+    private List<WifiP2pDevice> peers = new ArrayList<>();
     private IntentFilter intentFilter;
     private ChatContractor.Presenter presenter;
     private ChatAdapter adapter;
@@ -45,9 +52,11 @@ public class ChatFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        initListeners();
+
         manager = (WifiP2pManager) getActivity().getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(getActivity(), getActivity().getMainLooper(), null);
-        receiver = new WiFiDirectBroadcastReceiver(manager, channel);
+        receiver = new WiFiDirectBroadcastReceiver(manager, channel, peerListListener);
 
         initIntentFilter();
         discoverPeers();
@@ -103,6 +112,44 @@ public class ChatFragment extends Fragment
         etMessage.setText("");
     }
 
+    private void initListeners() {
+        peerListListener = new WifiP2pManager.PeerListListener() {
+            @Override
+            public void onPeersAvailable(WifiP2pDeviceList peerList) {
+                List<WifiP2pDevice> refreshedPeers = (List<WifiP2pDevice>) peerList.getDeviceList();
+                Log.d("@SABA@", "HERE");
+                if (!refreshedPeers.equals(peers)) {
+                    peers.clear();
+                    peers.addAll(refreshedPeers);
+
+                    // Perform any other updates needed based on the new list of
+                    // peers connected to the Wi-Fi P2P network.
+                    Log.d("@SABA@: ", peers.get(0).deviceName);
+                }
+
+                if (peers.size() == 0) {
+                    //TODO SHOW THAT NO PEERS ARE AVAILABLE
+                } else {
+                    WifiP2pDevice device = peers.get(0);
+                    WifiP2pConfig config = new WifiP2pConfig();
+                    config.deviceAddress = device.deviceAddress;
+
+                    manager.connect(channel, config, new WifiP2pManager.ActionListener() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onFailure(int reason) {
+
+                        }
+                    });
+                }
+            }
+        };
+    }
+
     private void initIntentFilter() {
         intentFilter = new IntentFilter();
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
@@ -120,7 +167,7 @@ public class ChatFragment extends Fragment
 
             @Override
             public void onFailure(int reason) {
-
+                //TODO SHOW ERROR ON UI
             }
         });
     }
