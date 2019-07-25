@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Locale;
 
 import scenes.chat.core.ChatFragment;
-import scenes.chat.model.ChatOpenMode;
 import scenes.history.model.ChatModel;
 
 public class ChatsRecyclerViewAdapter extends RecyclerView.Adapter {
@@ -51,8 +50,7 @@ public class ChatsRecyclerViewAdapter extends RecyclerView.Adapter {
             public void onClick(View v) {
                 Fragment fragment = new ChatFragment();
                 Bundle args = new Bundle();
-                args.putInt("id", chat.getId());
-                args.putSerializable("mode", ChatOpenMode.VIEW);
+                args.putInt("chatId", chat.getId());
                 fragment.setArguments(args);
                 FragmentManager fragmentManager = ((AppCompatActivity) v.getContext()).getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
