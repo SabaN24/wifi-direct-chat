@@ -74,7 +74,14 @@ public class ChatFragment extends Fragment
         discoverPeers();
 
         setupUIElements(view);
-        presenter = new ChatPresenter(this);
+        Bundle bundle = this.getArguments();
+        if(bundle != null) {
+            int chatId = bundle.getInt("CHAR_ID", -1);
+            String deviceName = bundle.getString("DEVICE_NAME", "");
+            presenter = new ChatPresenter(this, chatId, deviceName);
+        } else {
+            presenter = new ChatPresenter(this, -1, "");
+        }
         setupRecycler();
         setupBtnSendOnClickAction();
         presenter.start();
@@ -122,6 +129,11 @@ public class ChatFragment extends Fragment
     @Override
     public void clearInput() {
         etMessage.setText("");
+    }
+
+    @Override
+    public void sendMessage(String text) {
+        pipe.write(text.getBytes());
     }
 
     private void initListeners() {
@@ -183,7 +195,7 @@ public class ChatFragment extends Fragment
                 if (msg.what == 1) {
                     byte[] buff = (byte[]) msg.obj;
                     String text = new String(buff, 0, msg.arg1);
-                    //TODO SAVE MESSAGE
+                    presenter.messageRecieved(text);
                 }
                 return true;
             }
