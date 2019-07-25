@@ -9,11 +9,15 @@ public class ChatContractor {
         void draw(List<MessageModel> data);
         void clearInput();
         void sendMessage(String text);
+        void showLoader();
+        void hideLoader();
+        void moveBack();
     }
 
     interface Presenter {
         void start();
         void btnSendTapped(String text);
         void messageRecieved(String text);
+        void btnCancelTapped();
     }
 }

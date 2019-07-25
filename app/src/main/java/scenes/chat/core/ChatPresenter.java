@@ -24,6 +24,7 @@ public class ChatPresenter implements ChatContractor.Presenter {
 
     @Override
     public void start() {
+//        view.hideLoader();
         if(chatId == -1) {
             ChatModel chatModel = new ChatModel(0, deviceName, new Date(), 0);
             chatModel = DataManager.updateChat(chatModel);
@@ -49,5 +50,10 @@ public class ChatPresenter implements ChatContractor.Presenter {
         DataManager.updateMessage(newMessage);
         data.add(newMessage);
         view.draw(data);
+    }
+
+    @Override
+    public void btnCancelTapped() {
+        view.moveBack();
     }
 }

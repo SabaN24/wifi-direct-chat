@@ -13,6 +13,9 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -33,6 +36,7 @@ import p2p.Pipe;
 import p2p.Server;
 import p2p.WiFiDirectBroadcastReceiver;
 import scenes.chat.model.MessageModel;
+import scenes.history.core.HistoryFragment;
 
 public class ChatFragment extends Fragment
         implements ChatContractor.View {
@@ -41,6 +45,7 @@ public class ChatFragment extends Fragment
     private Button btnSend;
     private EditText etMessage;
     private View viewLoad;
+    private Button btnCancel;
 
     private WifiP2pManager manager;
     private WifiP2pManager.Channel channel;
@@ -65,9 +70,6 @@ public class ChatFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        viewLoad = view.findViewById(R.id.view_load);
-        viewLoad.setVisibility(View.INVISIBLE);
-
         initListeners();
 
         manager = (WifiP2pManager) getActivity().getSystemService(Context.WIFI_P2P_SERVICE);
@@ -88,6 +90,7 @@ public class ChatFragment extends Fragment
         }
         setupRecycler();
         setupBtnSendOnClickAction();
+        setupBtnCancelOnClickAction();
         presenter.start();
     }
 
@@ -104,6 +107,8 @@ public class ChatFragment extends Fragment
     }
 
     private void setupUIElements(View view) {
+        viewLoad = view.findViewById(R.id.view_load);
+        btnCancel = view.findViewById(R.id.button_cancel);
         recyclerView = view.findViewById(R.id.recycler_chat);
         etMessage = view.findViewById(R.id.et_message);
         btnSend = view.findViewById(R.id.btn_send);
@@ -124,6 +129,15 @@ public class ChatFragment extends Fragment
         });
     }
 
+    private void setupBtnCancelOnClickAction() {
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.btnCancelTapped();
+            }
+        });
+    }
+
     @Override
     public void draw(List<MessageModel> data) {
         adapter.setData(data);
@@ -138,6 +152,27 @@ public class ChatFragment extends Fragment
     @Override
     public void sendMessage(String text) {
         pipe.write(text.getBytes());
+    }
+
+    @Override
+    public void showLoader() {
+        viewLoad.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideLoader() {
+        viewLoad.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void moveBack() {
+        Fragment fragment = new HistoryFragment();
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.scene, fragment);
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
     private void initListeners() {
