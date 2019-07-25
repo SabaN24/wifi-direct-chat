@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
+import common.Utils;
 import scenes.chat.core.ChatFragment;
 import scenes.history.model.ChatModel;
 
@@ -28,8 +29,6 @@ public class ChatsRecyclerViewAdapter extends RecyclerView.Adapter {
     private List<ChatModel> chats;
 
     private HistoryContractor.Presenter presenter;
-
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy - hh:mm:ss", Locale.US);
 
     public ChatsRecyclerViewAdapter(Context context, HistoryContractor.Presenter presenter) {
         super();
@@ -42,10 +41,17 @@ public class ChatsRecyclerViewAdapter extends RecyclerView.Adapter {
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, final int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_chat_info, viewGroup, false);
+        return new ChatsRecyclerViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+        ChatsRecyclerViewHolder holder = (ChatsRecyclerViewHolder) viewHolder;
         final ChatModel chat = chats.get(i);
-        view.setOnClickListener(new View.OnClickListener() {
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Fragment fragment = new ChatFragment();
@@ -60,7 +66,7 @@ public class ChatsRecyclerViewAdapter extends RecyclerView.Adapter {
                 fragmentTransaction.commit();
             }
         });
-        view.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 new AlertDialog.Builder(v.getContext())
@@ -76,16 +82,9 @@ public class ChatsRecyclerViewAdapter extends RecyclerView.Adapter {
                 return true;
             }
         });
-        return new ChatsRecyclerViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-        ChatsRecyclerViewHolder holder = (ChatsRecyclerViewHolder) viewHolder;
-        ChatModel chat = chats.get(i);
 
         holder.chatDeviceName.setText(chat.getDeviceName());
-        holder.chatTime.setText(sdf.format(chat.getTime()));
+        holder.chatTime.setText(Utils.SDF.format(chat.getTime()));
 
         String count = chat.getMessagesCount() + "";
         holder.chatMessagesCount.setText(count);

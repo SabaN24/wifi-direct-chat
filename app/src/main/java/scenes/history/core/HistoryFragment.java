@@ -65,6 +65,7 @@ public class HistoryFragment extends Fragment
         }
         String title = getString(R.string.history) + (chats.isEmpty() ? "" : (" (" + chats.size() + ")"));
         Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setTitle(title);
+        Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setSubtitle("");
     }
 
 }

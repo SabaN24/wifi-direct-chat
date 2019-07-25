@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,12 +24,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.saba.wifidirectchat.R;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import p2p.Client;
 import p2p.Pipe;
@@ -45,6 +48,7 @@ public class ChatFragment extends Fragment
     private EditText etMessage;
     private View viewLoad;
     private Button btnCancel;
+    private TextView loadingConnectionText;
 
     private WifiP2pManager manager;
     private WifiP2pManager.Channel channel;
@@ -80,12 +84,11 @@ public class ChatFragment extends Fragment
 
         setupUIElements(view);
         Bundle bundle = this.getArguments();
-        if(bundle != null) {
-            int chatId = bundle.getInt("CHAR_ID", -1);
-            String deviceName = bundle.getString("DEVICE_NAME", "");
-            presenter = new ChatPresenter(this, chatId, deviceName);
+        if (bundle != null) {
+            int chatId = bundle.getInt("chatId", -1);
+            presenter = new ChatPresenter(this, chatId);
         } else {
-            presenter = new ChatPresenter(this, -1, "");
+            presenter = new ChatPresenter(this, -1);
         }
         setupRecycler();
         setupBtnSendOnClickAction();
@@ -107,6 +110,7 @@ public class ChatFragment extends Fragment
 
     private void setupUIElements(View view) {
         viewLoad = view.findViewById(R.id.view_load);
+        loadingConnectionText = view.findViewById(R.id.loading_connection_text);
         btnCancel = view.findViewById(R.id.button_cancel);
         recyclerView = view.findViewById(R.id.recycler_chat);
         etMessage = view.findViewById(R.id.et_message);
@@ -156,11 +160,13 @@ public class ChatFragment extends Fragment
     @Override
     public void showLoader() {
         viewLoad.setVisibility(View.VISIBLE);
+        loadingConnectionText.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideLoader() {
         viewLoad.setVisibility(View.GONE);
+        loadingConnectionText.setVisibility(View.GONE);
     }
 
     @Override
@@ -174,6 +180,16 @@ public class ChatFragment extends Fragment
         fragmentTransaction.commit();
     }
 
+    @Override
+    public void setTitle(String title) {
+        Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setTitle(title);
+    }
+
+    @Override
+    public void setSubtitle(String subtitle) {
+        Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setSubtitle(subtitle);
+    }
+
     private void initListeners() {
         peerListListener = new WifiP2pManager.PeerListListener() {
             @Override
@@ -184,14 +200,10 @@ public class ChatFragment extends Fragment
                     peers.clear();
                     peers.addAll(refreshedPeers);
 
-                    // Perform any other updates needed based on the new list of
-                    // peers connected to the Wi-Fi P2P network.
                     Log.d("@SABA@: ", peers.get(0).deviceName);
                 }
 
-                if (peers.size() == 0) {
-                    //TODO SHOW THAT NO PEERS ARE AVAILABLE
-                } else {
+                if (!peers.isEmpty()) {
                     WifiP2pDevice device = peers.get(0);
                     WifiP2pConfig config = new WifiP2pConfig();
                     config.deviceAddress = device.deviceAddress;

@@ -18,7 +18,7 @@ public class DataManager {
         return result;
     }
 
-    public ChatModel getChatById(int id) {
+    public static ChatModel getChatById(int id) {
         ChatEntity entity = Database.getInstance().chatDao().getChatById(id);
         return new ChatModel(entity.getId(), entity.getDeviceName(), DateConverter.toDate(entity.getTime()),
                 Database.getInstance().messageDao().getChatMessagesCount(entity.getId()));

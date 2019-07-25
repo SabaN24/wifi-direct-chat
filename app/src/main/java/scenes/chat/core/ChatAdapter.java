@@ -11,6 +11,7 @@ import com.saba.wifidirectchat.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import common.Utils;
 import scenes.chat.model.MessageModel;
 
 public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
@@ -32,7 +33,7 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
     public void onBindViewHolder(@NonNull MessageViewHolder messageViewHolder, int i) {
         MessageModel model = data.get(i);
         messageViewHolder.message.setText(model.getText());
-        messageViewHolder.date.setText(model.getTime().toString());
+        messageViewHolder.date.setText(Utils.SDF.format(model.getTime()));
         // TODO (Levan)
         // left/right side
         if(model.isResponse()) {
