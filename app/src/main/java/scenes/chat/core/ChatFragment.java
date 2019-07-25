@@ -40,6 +40,7 @@ public class ChatFragment extends Fragment
     private RecyclerView recyclerView;
     private Button btnSend;
     private EditText etMessage;
+    private View viewLoad;
 
     private WifiP2pManager manager;
     private WifiP2pManager.Channel channel;
@@ -63,6 +64,9 @@ public class ChatFragment extends Fragment
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        viewLoad = view.findViewById(R.id.view_load);
+        viewLoad.setVisibility(View.INVISIBLE);
 
         initListeners();
 
