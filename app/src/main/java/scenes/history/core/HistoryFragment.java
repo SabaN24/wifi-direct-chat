@@ -27,6 +27,8 @@ public class HistoryFragment extends Fragment
 
     private ChatsRecyclerViewAdapter chatsRecyclerViewAdapter;
 
+    private View view;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_history, container, false);
@@ -35,8 +37,8 @@ public class HistoryFragment extends Fragment
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        this.view = view;
         presenter = new HistoryPresenter(this);
-        Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setTitle(R.string.history);
         chatsRecyclerViewAdapter = new ChatsRecyclerViewAdapter(getContext(), presenter);
         chatsRecyclerView = view.findViewById(R.id.chatsRecyclerView);
         chatsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -54,6 +56,15 @@ public class HistoryFragment extends Fragment
     public void drawChats(List<ChatModel> chats) {
         chatsRecyclerViewAdapter.setChats(chats);
         chatsRecyclerViewAdapter.notifyDataSetChanged();
+        if (chats.isEmpty()) {
+            view.findViewById(R.id.clearHistoryButton).setVisibility(View.INVISIBLE);
+            view.findViewById(R.id.noChatsText).setVisibility(View.VISIBLE);
+        } else {
+            view.findViewById(R.id.clearHistoryButton).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.noChatsText).setVisibility(View.INVISIBLE);
+        }
+        String title = getString(R.string.history) + (chats.isEmpty() ? "" : ("(" + chats.size() + ")"));
+        Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setTitle(title);
     }
 
 }

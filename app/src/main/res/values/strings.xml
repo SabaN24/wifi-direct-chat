@@ -16,4 +16,5 @@
     <string name="yes">დიახ</string>
     <string name="no">არა</string>
     <string name="confirm">დადასტურება</string>
+    <string name="noChatsFound">ისტორია არ მოიძებნა</string>
 </resources>
