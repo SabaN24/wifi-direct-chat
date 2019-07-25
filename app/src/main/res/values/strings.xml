@@ -16,6 +16,6 @@
     <string name="yes">დიახ</string>
     <string name="no">არა</string>
     <string name="confirm">დადასტურება</string>
-    <string name="loading_connection">loading_connection</string>
-    <string name="nochatsfound">noChatsFound</string>
+    <string name="loading_connection">Loading connection…</string>
+    <string name="noChatsFound">ისტორია არ მოიძებნა</string>
 </resources>

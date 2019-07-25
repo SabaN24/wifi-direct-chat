@@ -40,7 +40,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:text="@string/nochatsfound"
+        android:text="@string/noChatsFound"
         android:textColor="@color/colorAccent"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
