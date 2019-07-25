@@ -24,9 +24,11 @@ public class DataManager {
                 Database.getInstance().messageDao().getChatMessagesCount(entity.getId()));
     }
 
-    public static void updateChat(ChatModel chat) {
+    public static ChatModel updateChat(ChatModel chat) {
         ChatEntity entity = new ChatEntity(chat.getId(), chat.getDeviceName(), DateConverter.fromDate(chat.getTime()));
         Database.getInstance().chatDao().updateChat(entity);
+        chat.setId(entity.getId());
+        return chat;
     }
 
     public static void deleteChat(int chatId) {
