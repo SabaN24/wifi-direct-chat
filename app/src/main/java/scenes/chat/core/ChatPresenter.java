@@ -82,4 +82,9 @@ public class ChatPresenter implements ChatContractor.Presenter {
         data.clear();
         view.draw(data);
     }
+
+    @Override
+    public boolean isHistory() {
+        return isHistory;
+    }
 }

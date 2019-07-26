@@ -16,7 +16,6 @@ public class ChatContractor {
         void setSubtitle(String subtitle);
         void hideSendPanel();
         void showSendPanel();
-        void showBtnDelete();
     }
 
     interface Presenter {
@@ -25,5 +24,6 @@ public class ChatContractor {
         void messageReceived(String text);
         void btnCancelTapped();
         void btnDeleteTapped();
+        boolean isHistory();
     }
 }

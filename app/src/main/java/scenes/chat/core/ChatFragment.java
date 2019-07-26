@@ -19,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,7 +81,6 @@ public class ChatFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         setHasOptionsMenu(true);
         initListeners();
-
         manager = (WifiP2pManager) getActivity().getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(getActivity(), getActivity().getMainLooper(), null);
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, peerListListener, connectionInfoListener);
@@ -100,6 +100,15 @@ public class ChatFragment extends Fragment
         setupBtnSendOnClickAction();
         setupBtnCancelOnClickAction();
         presenter.start();
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        if(presenter != null) {
+            if(!presenter.isHistory()) {
+                menu.clear();
+            }
+        }
     }
 
     @Override
@@ -232,11 +241,6 @@ public class ChatFragment extends Fragment
         btnSend.setVisibility(View.VISIBLE);
         sendSeparator.setVisibility(View.VISIBLE);
         sendImage.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void showBtnDelete() {
-
     }
 
     private void initListeners() {
