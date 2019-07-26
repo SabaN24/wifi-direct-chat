@@ -39,6 +39,7 @@ public class ChatPresenter implements ChatContractor.Presenter {
             time = new Date();
             ChatModel chatModel = DataManager.updateChat(new ChatModel(0, deviceName, time, 0));
             chatId = chatModel.getId();
+            view.prepareForChat();
         }
         view.setTitle(deviceName);
         view.setSubtitle(Utils.SDF.format(time));

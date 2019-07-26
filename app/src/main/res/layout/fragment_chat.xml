@@ -13,7 +13,7 @@
             android:id="@+id/recycler_chat"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/view_separator"
+            app:layout_constraintBottom_toTopOf="@+id/send_separator"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -21,7 +21,7 @@
             app:layout_constraintVertical_bias="0.0" />
 
         <View
-            android:id="@+id/view_separator"
+            android:id="@+id/send_separator"
             android:layout_width="0dp"
             android:layout_height="2dp"
             android:layout_marginBottom="8dp"
@@ -42,7 +42,7 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/send_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -51,7 +51,7 @@
             android:src="@drawable/ic_send"
             app:layout_constraintBottom_toBottomOf="@+id/send_panel"
             app:layout_constraintEnd_toEndOf="@+id/send_panel"
-            app:layout_constraintTop_toBottomOf="@+id/view_separator" />
+            app:layout_constraintTop_toBottomOf="@+id/send_separator" />
 
         <Button
             android:id="@+id/btn_send"
@@ -59,10 +59,10 @@
             android:layout_height="0dp"
             android:background="#00FFFFFF"
             android:textColor="#00FFFFFF"
-            app:layout_constraintBottom_toBottomOf="@+id/imageView"
-            app:layout_constraintEnd_toEndOf="@+id/imageView"
-            app:layout_constraintStart_toStartOf="@+id/imageView"
-            app:layout_constraintTop_toTopOf="@+id/imageView" />
+            app:layout_constraintBottom_toBottomOf="@+id/send_button"
+            app:layout_constraintEnd_toEndOf="@+id/send_button"
+            app:layout_constraintStart_toStartOf="@+id/send_button"
+            app:layout_constraintTop_toTopOf="@+id/send_button" />
 
         <EditText
             android:id="@+id/et_message"

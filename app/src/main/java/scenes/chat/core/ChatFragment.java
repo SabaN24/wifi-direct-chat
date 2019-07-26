@@ -18,12 +18,12 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.saba.wifidirectchat.R;
@@ -49,6 +49,8 @@ public class ChatFragment extends Fragment
     private View viewLoad;
     private Button btnCancel;
     private TextView loadingConnectionText;
+    private View sendSeparator;
+    private ImageView sendImage;
 
     private WifiP2pManager manager;
     private WifiP2pManager.Channel channel;
@@ -115,6 +117,12 @@ public class ChatFragment extends Fragment
         recyclerView = view.findViewById(R.id.recycler_chat);
         etMessage = view.findViewById(R.id.et_message);
         btnSend = view.findViewById(R.id.btn_send);
+        sendSeparator = view.findViewById(R.id.send_separator);
+        sendImage = view.findViewById(R.id.send_button);
+        etMessage.setVisibility(View.INVISIBLE);
+        btnSend.setVisibility(View.INVISIBLE);
+        sendSeparator.setVisibility(View.INVISIBLE);
+        sendImage.setVisibility(View.INVISIBLE);
     }
 
     private void setupRecycler() {
@@ -153,8 +161,14 @@ public class ChatFragment extends Fragment
     }
 
     @Override
-    public void sendMessage(String text) {
-//        pipe.write(text.getBytes());
+    public void sendMessage(final String text) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                pipe.write(text.getBytes());
+
+            }
+        }).start();
     }
 
     @Override
@@ -190,17 +204,22 @@ public class ChatFragment extends Fragment
         Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setSubtitle(subtitle);
     }
 
+    @Override
+    public void prepareForChat() {
+        etMessage.setVisibility(View.VISIBLE);
+        btnSend.setVisibility(View.VISIBLE);
+        sendSeparator.setVisibility(View.VISIBLE);
+        sendImage.setVisibility(View.VISIBLE);
+    }
+
     private void initListeners() {
         peerListListener = new WifiP2pManager.PeerListListener() {
             @Override
             public void onPeersAvailable(WifiP2pDeviceList peerList) {
-                List<WifiP2pDevice> refreshedPeers = (List<WifiP2pDevice>) peerList.getDeviceList();
-                Log.d("@SABA@", "HERE");
+                List<WifiP2pDevice> refreshedPeers = new ArrayList<>(peerList.getDeviceList());
                 if (!refreshedPeers.equals(peers)) {
                     peers.clear();
                     peers.addAll(refreshedPeers);
-
-                    Log.d("@SABA@: ", peers.get(0).deviceName);
                 }
 
                 if (!peers.isEmpty()) {
@@ -227,15 +246,27 @@ public class ChatFragment extends Fragment
             @Override
             public void onConnectionInfoAvailable(WifiP2pInfo info) {
                 final InetAddress groupOwner = info.groupOwnerAddress;
-                if (info.groupFormed) {
-                    if (info.isGroupOwner) {
-                        server = new Server(pipe, handler);
-                        server.start();
-                    } else {
-                        client = new Client(groupOwner.getHostAddress(), pipe, handler);
-                        client.start();
-                    }
-                }
+//                if (info.groupFormed) {
+//                    if (info.isGroupOwner) {
+//                        server = new Server(pipe, handler);
+//                        server.start();
+//                        while (true) {
+//                            if (server.getPipe() != null) {
+//                                pipe = server.getPipe();
+//                                break;
+//                            }
+//                        }
+//                    } else {
+//                        client = new Client(groupOwner.getHostAddress(), pipe, handler);
+//                        client.start();
+//                        while (true) {
+//                            if (client.getPipe() != null) {
+//                                pipe = client.getPipe();
+//                                break;
+//                            }
+//                        }
+//                    }
+//                }
             }
         };
 
@@ -269,7 +300,6 @@ public class ChatFragment extends Fragment
 
             @Override
             public void onFailure(int reason) {
-                //TODO SHOW ERROR ON UI (COULD NOT DISCOVER PEERS)
             }
         });
     }

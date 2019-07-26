@@ -18,6 +18,10 @@ public class Server extends Thread {
         this.handler = handler;
     }
 
+    public Pipe getPipe() {
+        return pipe;
+    }
+
     @Override
     public void run() {
         try {
