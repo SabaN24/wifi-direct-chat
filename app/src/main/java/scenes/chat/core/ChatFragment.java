@@ -28,14 +28,18 @@ import android.widget.TextView;
 
 import com.saba.wifidirectchat.R;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import p2p.Client;
-import p2p.Pipe;
-import p2p.Server;
+import p2p.ConnectionConstants;
 import p2p.WiFiDirectBroadcastReceiver;
 import scenes.chat.model.MessageModel;
 import scenes.history.core.HistoryFragment;
@@ -62,6 +66,7 @@ public class ChatFragment extends Fragment
     private WifiP2pManager.ConnectionInfoListener connectionInfoListener;
     private ChatAdapter adapter;
     private Handler handler;
+
     private Server server;
     private Client client;
     private Pipe pipe;
@@ -204,14 +209,6 @@ public class ChatFragment extends Fragment
         Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setSubtitle(subtitle);
     }
 
-    @Override
-    public void prepareForChat() {
-        etMessage.setVisibility(View.VISIBLE);
-        btnSend.setVisibility(View.VISIBLE);
-        sendSeparator.setVisibility(View.VISIBLE);
-        sendImage.setVisibility(View.VISIBLE);
-    }
-
     private void initListeners() {
         peerListListener = new WifiP2pManager.PeerListListener() {
             @Override
@@ -230,7 +227,10 @@ public class ChatFragment extends Fragment
                     manager.connect(channel, config, new WifiP2pManager.ActionListener() {
                         @Override
                         public void onSuccess() {
-
+                            etMessage.setVisibility(View.VISIBLE);
+                            btnSend.setVisibility(View.VISIBLE);
+                            sendSeparator.setVisibility(View.VISIBLE);
+                            sendImage.setVisibility(View.VISIBLE);
                         }
 
                         @Override
@@ -246,27 +246,15 @@ public class ChatFragment extends Fragment
             @Override
             public void onConnectionInfoAvailable(WifiP2pInfo info) {
                 final InetAddress groupOwner = info.groupOwnerAddress;
-//                if (info.groupFormed) {
-//                    if (info.isGroupOwner) {
-//                        server = new Server(pipe, handler);
-//                        server.start();
-//                        while (true) {
-//                            if (server.getPipe() != null) {
-//                                pipe = server.getPipe();
-//                                break;
-//                            }
-//                        }
-//                    } else {
-//                        client = new Client(groupOwner.getHostAddress(), pipe, handler);
-//                        client.start();
-//                        while (true) {
-//                            if (client.getPipe() != null) {
-//                                pipe = client.getPipe();
-//                                break;
-//                            }
-//                        }
-//                    }
-//                }
+                if (info.groupFormed) {
+                    if (info.isGroupOwner) {
+                        server = new Server();
+                        server.start();
+                    } else {
+                        client = new Client(groupOwner.getHostAddress());
+                        client.start();
+                    }
+                }
             }
         };
 
@@ -276,7 +264,7 @@ public class ChatFragment extends Fragment
                 if (msg.what == 1) {
                     byte[] buff = (byte[]) msg.obj;
                     String text = new String(buff, 0, msg.arg1);
-                    presenter.messageRecieved(text);
+                    presenter.messageReceived(text);
                 }
                 return true;
             }
@@ -303,4 +291,90 @@ public class ChatFragment extends Fragment
             }
         });
     }
+
+    private class Server extends Thread {
+
+        private Socket socket;
+        private ServerSocket serverSocket;
+
+        @Override
+        public void run() {
+            try {
+                serverSocket = new ServerSocket(ConnectionConstants.PORT);
+                socket = serverSocket.accept();
+                pipe = new Pipe(socket);
+                pipe.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class Client extends Thread {
+
+        private Socket socket;
+        private String hostAddress;
+
+        Client(String hostAddress) {
+            this.hostAddress = hostAddress;
+            this.socket = new Socket();
+        }
+
+        @Override
+        public void run() {
+            try {
+                socket.connect(new InetSocketAddress(hostAddress, ConnectionConstants.PORT), ConnectionConstants.TIMEOUT);
+                pipe = new Pipe(socket);
+                pipe.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    private class Pipe extends Thread {
+
+        private Socket socket;
+        private InputStream inputStream;
+        private OutputStream outputStream;
+
+        Pipe(Socket socket) {
+            this.socket = socket;
+            try {
+                this.inputStream = socket.getInputStream();
+                this.outputStream = socket.getOutputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void run() {
+            byte[] buffer = new byte[1024];
+            int bytes;
+
+            while (socket != null) {
+                try {
+                    bytes = inputStream.read(buffer);
+                    if (bytes > 0) {
+                        handler.obtainMessage(1, bytes, -1, buffer).sendToTarget();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        void write(byte[] bytes) {
+            try {
+                outputStream.write(bytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+
 }

@@ -15,10 +15,9 @@ public class ChatPresenter implements ChatContractor.Presenter {
     private List<MessageModel> data;
     private int chatId;
     private String deviceName;
-    private Date time;
     private boolean isHistory;
 
-    public ChatPresenter(ChatContractor.View view, int chatId) {
+    ChatPresenter(ChatContractor.View view, int chatId) {
         this.view = view;
         this.chatId = chatId;
         isHistory = chatId != -1;
@@ -28,6 +27,7 @@ public class ChatPresenter implements ChatContractor.Presenter {
     @Override
     public void start() {
         view.hideLoader();
+        Date time;
         if (isHistory) {
             view.hideLoader();
             ChatModel chatModel = DataManager.getChatById(chatId);
@@ -39,7 +39,6 @@ public class ChatPresenter implements ChatContractor.Presenter {
             time = new Date();
             ChatModel chatModel = DataManager.updateChat(new ChatModel(0, deviceName, time, 0));
             chatId = chatModel.getId();
-            view.prepareForChat();
         }
         view.setTitle(deviceName);
         view.setSubtitle(Utils.SDF.format(time));
@@ -60,7 +59,7 @@ public class ChatPresenter implements ChatContractor.Presenter {
     }
 
     @Override
-    public void messageRecieved(String text) {
+    public void messageReceived(String text) {
         MessageModel newMessage = new MessageModel(0, text, new Date(), true, chatId);
         DataManager.updateMessage(newMessage);
         data.add(newMessage);

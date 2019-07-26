@@ -14,13 +14,12 @@ public class ChatContractor {
         void moveBack();
         void setTitle(String title);
         void setSubtitle(String subtitle);
-        void prepareForChat();
     }
 
     interface Presenter {
         void start();
         void btnSendTapped(String text);
-        void messageRecieved(String text);
+        void messageReceived(String text);
         void btnCancelTapped();
     }
 }
