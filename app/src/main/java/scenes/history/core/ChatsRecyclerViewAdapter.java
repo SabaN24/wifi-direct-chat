@@ -16,9 +16,7 @@ import android.view.ViewGroup;
 
 import com.saba.wifidirectchat.R;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
 import common.Utils;
 import scenes.chat.core.ChatFragment;
@@ -71,7 +69,7 @@ public class ChatsRecyclerViewAdapter extends RecyclerView.Adapter {
             public boolean onLongClick(View v) {
                 new AlertDialog.Builder(v.getContext())
                         .setTitle(v.getContext().getResources().getString(R.string.confirm))
-                        .setMessage(String.format(v.getContext().getResources().getString(R.string.confirmClearHistory), chat.getDeviceName()))
+                        .setMessage(String.format(v.getContext().getResources().getString(R.string.confirmDeleteChat), chat.getDeviceName()))
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(v.getContext().getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {

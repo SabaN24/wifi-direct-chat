@@ -14,7 +14,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
 import com.saba.wifidirectchat.R;
+
 import scenes.chat.core.ChatFragment;
 import scenes.history.core.HistoryFragment;
 
@@ -30,6 +32,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         setContentView(R.layout.activity_navigation_drawer);
         Drawable drawable = ContextCompat.getDrawable(getApplicationContext(),R.drawable.ic_delete);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        drawable.setBounds(0, 0, 36, 36);
         toolbar.setOverflowIcon(drawable);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

@@ -1,7 +1,5 @@
 package scenes.chat.core;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +14,6 @@ public class ChatPresenter implements ChatContractor.Presenter {
     private ChatContractor.View view;
     private List<MessageModel> data;
     private int chatId;
-    private String deviceName;
     private boolean isHistory;
 
     ChatPresenter(ChatContractor.View view, int chatId) {
@@ -28,24 +25,27 @@ public class ChatPresenter implements ChatContractor.Presenter {
 
     @Override
     public void start() {
-        view.hideLoader();
-        Date time;
         if (isHistory) {
             view.hideSendPanel();
             view.hideLoader();
             ChatModel chatModel = DataManager.getChatById(chatId);
-            deviceName = chatModel.getDeviceName();
-            time = chatModel.getTime();
+            String deviceName = chatModel.getDeviceName();
+            Date time = chatModel.getTime();
             data = DataManager.getChatMessages(chatId);
             view.draw(data);
+            view.setTitle(deviceName);
+            view.setSubtitle(Utils.SDF.format(time));
         } else {
-            view.showSendPanel();
-            time = new Date();
-            ChatModel chatModel = DataManager.updateChat(new ChatModel(0, deviceName, time, 0));
-            chatId = chatModel.getId();
+            view.searchForPeers();
         }
-        view.setTitle(deviceName);
-        view.setSubtitle(Utils.SDF.format(time));
+    }
+
+    @Override
+    public void createNewChat(String deviceName) {
+        Date time = new Date();
+        ChatModel chatModel = DataManager.updateChat(new ChatModel(0, deviceName, time, 0));
+        view.showChatElements(deviceName, time);
+        chatId = chatModel.getId();
     }
 
     @Override
@@ -77,14 +77,13 @@ public class ChatPresenter implements ChatContractor.Presenter {
 
     @Override
     public void btnDeleteTapped() {
-        Log.d("qqq", "" + chatId);
         DataManager.deleteChat(chatId);
-        data.clear();
-        view.draw(data);
+        view.moveBack();
     }
 
     @Override
     public boolean isHistory() {
         return isHistory;
     }
+
 }

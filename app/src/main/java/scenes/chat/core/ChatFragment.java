@@ -1,6 +1,7 @@
 package scenes.chat.core;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -15,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,12 +25,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.saba.wifidirectchat.R;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,8 +42,11 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import common.Utils;
 import p2p.ConnectionConstants;
 import p2p.WiFiDirectBroadcastReceiver;
 import scenes.chat.model.MessageModel;
@@ -51,13 +59,13 @@ public class ChatFragment extends Fragment
     private Button btnSend;
     private EditText etMessage;
     private View viewLoad;
-    private ProgressBar progresBar;
+    private ProgressBar progressBar;
     private Button btnCancel;
     private TextView loadingConnectionText;
     private View sendSeparator;
     private ImageView sendImage;
 
-    private WifiP2pManager manager;
+    private WifiP2pManager p2pManager;
     private WifiP2pManager.Channel channel;
     private WiFiDirectBroadcastReceiver receiver;
     private WifiP2pManager.PeerListListener peerListListener;
@@ -70,6 +78,7 @@ public class ChatFragment extends Fragment
     private Server server;
     private Client client;
     private Pipe pipe;
+    private String connectedDeviceName;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -80,14 +89,6 @@ public class ChatFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setHasOptionsMenu(true);
-        initListeners();
-        manager = (WifiP2pManager) getActivity().getSystemService(Context.WIFI_P2P_SERVICE);
-        channel = manager.initialize(getActivity(), getActivity().getMainLooper(), null);
-        receiver = new WiFiDirectBroadcastReceiver(manager, channel, peerListListener, connectionInfoListener);
-
-        initIntentFilter();
-        discoverPeers();
-
         setupUIElements(view);
         Bundle bundle = this.getArguments();
         if (bundle != null) {
@@ -96,6 +97,7 @@ public class ChatFragment extends Fragment
         } else {
             presenter = new ChatPresenter(this, -1);
         }
+        setTitle(getString(R.string.chat));
         setupRecycler();
         setupBtnSendOnClickAction();
         setupBtnCancelOnClickAction();
@@ -104,8 +106,8 @@ public class ChatFragment extends Fragment
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        if(presenter != null) {
-            if(!presenter.isHistory()) {
+        if (presenter != null) {
+            if (!presenter.isHistory()) {
                 menu.clear();
             }
         }
@@ -114,28 +116,36 @@ public class ChatFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().registerReceiver(receiver, intentFilter);
+        if (receiver != null) {
+            getActivity().registerReceiver(receiver, intentFilter);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().unregisterReceiver(receiver);
+        if (receiver != null) {
+            getActivity().unregisterReceiver(receiver);
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        presenter.btnDeleteTapped();
-        int id = item.getItemId();
-        if (id == R.id.action_delete) {
-            presenter.btnDeleteTapped();
-            return false;
-        }
-        return super.onOptionsItemSelected(item);
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getActivity().getResources().getString(R.string.confirm))
+                .setMessage(getString(R.string.confirmDeleteThisChat))
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(getActivity().getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        presenter.btnDeleteTapped();
+                    }
+                })
+                .setNegativeButton(getActivity().getResources().getString(R.string.no), null).show();
+        return true;
     }
 
     private void setupUIElements(View view) {
-        progresBar = view.findViewById(R.id.progress_bar);
+        progressBar = view.findViewById(R.id.progress_bar);
         viewLoad = view.findViewById(R.id.view_load);
         loadingConnectionText = view.findViewById(R.id.loading_connection_text);
         btnCancel = view.findViewById(R.id.button_cancel);
@@ -144,6 +154,18 @@ public class ChatFragment extends Fragment
         btnSend = view.findViewById(R.id.btn_send);
         sendSeparator = view.findViewById(R.id.send_separator);
         sendImage = view.findViewById(R.id.send_button);
+
+        etMessage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (v.getId() == R.id.et_message && !hasFocus) {
+
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
+                }
+            }
+        });
     }
 
     private void setupRecycler() {
@@ -183,25 +205,13 @@ public class ChatFragment extends Fragment
 
     @Override
     public void sendMessage(final String text) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                pipe.write(text.getBytes());
-
-            }
-        }).start();
-    }
-
-    @Override
-    public void showLoader() {
-        viewLoad.setVisibility(View.VISIBLE);
-        loadingConnectionText.setVisibility(View.VISIBLE);
+        pipe.write(text.getBytes());
     }
 
     @Override
     public void hideLoader() {
         btnCancel.setVisibility(View.INVISIBLE);
-        progresBar.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
         viewLoad.setVisibility(View.INVISIBLE);
         loadingConnectionText.setVisibility(View.INVISIBLE);
     }
@@ -236,11 +246,27 @@ public class ChatFragment extends Fragment
     }
 
     @Override
-    public void showSendPanel() {
+    public void searchForPeers() {
+        initListeners();
+        p2pManager = (WifiP2pManager) getActivity().getSystemService(Context.WIFI_P2P_SERVICE);
+        channel = p2pManager.initialize(getActivity(), getActivity().getMainLooper(), null);
+        receiver = new WiFiDirectBroadcastReceiver(p2pManager, channel, peerListListener, connectionInfoListener);
+
+        initIntentFilter();
+        discoverPeers();
+
+        getActivity().registerReceiver(receiver, intentFilter);
+    }
+
+    @Override
+    public void showChatElements(String deviceName, Date time) {
         etMessage.setVisibility(View.VISIBLE);
         btnSend.setVisibility(View.VISIBLE);
         sendSeparator.setVisibility(View.VISIBLE);
         sendImage.setVisibility(View.VISIBLE);
+
+        setTitle(deviceName);
+        setSubtitle(Utils.SDF.format(time));
     }
 
     private void initListeners() {
@@ -254,21 +280,25 @@ public class ChatFragment extends Fragment
                 }
 
                 if (!peers.isEmpty()) {
-                    WifiP2pDevice device = peers.get(0);
-                    WifiP2pConfig config = new WifiP2pConfig();
-                    config.deviceAddress = device.deviceAddress;
+                    final WifiP2pDevice device = peers.get(0);
+                    if (!device.deviceName.equals(connectedDeviceName)) {
+                        WifiP2pConfig config = new WifiP2pConfig();
+                        config.deviceAddress = device.deviceAddress;
 
-                    manager.connect(channel, config, new WifiP2pManager.ActionListener() {
-                        @Override
-                        public void onSuccess() {
+                        p2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
+                            @Override
+                            public void onSuccess() {
+                                connectedDeviceName = device.deviceName;
+                                hideLoader();
+                                presenter.createNewChat(device.deviceName);
+                            }
 
-                        }
+                            @Override
+                            public void onFailure(int reason) {
 
-                        @Override
-                        public void onFailure(int reason) {
-
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
             }
         };
@@ -311,7 +341,7 @@ public class ChatFragment extends Fragment
     }
 
     private void discoverPeers() {
-        manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+        p2pManager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
 
