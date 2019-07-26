@@ -18,4 +18,5 @@
     <string name="confirm">დადასტურება</string>
     <string name="loading_connection">Loading connection…</string>
     <string name="noChatsFound">ისტორია არ მოიძებნა</string>
+    <string name="delete">წაშლა</string>
 </resources>

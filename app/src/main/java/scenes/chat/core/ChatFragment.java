@@ -19,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -26,9 +27,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.saba.wifidirectchat.R;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,7 +38,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import p2p.ConnectionConstants;
 import p2p.WiFiDirectBroadcastReceiver;
 import scenes.chat.model.MessageModel;
@@ -80,7 +78,7 @@ public class ChatFragment extends Fragment
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        setHasOptionsMenu(true);
         initListeners();
 
         manager = (WifiP2pManager) getActivity().getSystemService(Context.WIFI_P2P_SERVICE);
@@ -114,6 +112,17 @@ public class ChatFragment extends Fragment
     public void onPause() {
         super.onPause();
         getActivity().unregisterReceiver(receiver);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        presenter.btnDeleteTapped();
+        int id = item.getItemId();
+        if (id == R.id.action_delete) {
+            presenter.btnDeleteTapped();
+            return false;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setupUIElements(View view) {
@@ -223,6 +232,11 @@ public class ChatFragment extends Fragment
         btnSend.setVisibility(View.VISIBLE);
         sendSeparator.setVisibility(View.VISIBLE);
         sendImage.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showBtnDelete() {
+
     }
 
     private void initListeners() {

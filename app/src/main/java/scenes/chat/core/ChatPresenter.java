@@ -1,5 +1,7 @@
 package scenes.chat.core;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -71,5 +73,13 @@ public class ChatPresenter implements ChatContractor.Presenter {
     @Override
     public void btnCancelTapped() {
         view.moveBack();
+    }
+
+    @Override
+    public void btnDeleteTapped() {
+        Log.d("qqq", "" + chatId);
+        DataManager.deleteChat(chatId);
+        data.clear();
+        view.draw(data);
     }
 }
