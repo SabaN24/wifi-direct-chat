@@ -14,6 +14,8 @@ public class ChatContractor {
         void moveBack();
         void setTitle(String title);
         void setSubtitle(String subtitle);
+        void hideSendPanel();
+        void showSendPanel();
     }
 
     interface Presenter {

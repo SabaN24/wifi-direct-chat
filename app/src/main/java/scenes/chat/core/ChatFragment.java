@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.saba.wifidirectchat.R;
@@ -51,6 +52,7 @@ public class ChatFragment extends Fragment
     private Button btnSend;
     private EditText etMessage;
     private View viewLoad;
+    private ProgressBar progresBar;
     private Button btnCancel;
     private TextView loadingConnectionText;
     private View sendSeparator;
@@ -66,7 +68,6 @@ public class ChatFragment extends Fragment
     private WifiP2pManager.ConnectionInfoListener connectionInfoListener;
     private ChatAdapter adapter;
     private Handler handler;
-
     private Server server;
     private Client client;
     private Pipe pipe;
@@ -116,6 +117,7 @@ public class ChatFragment extends Fragment
     }
 
     private void setupUIElements(View view) {
+        progresBar = view.findViewById(R.id.progress_bar);
         viewLoad = view.findViewById(R.id.view_load);
         loadingConnectionText = view.findViewById(R.id.loading_connection_text);
         btnCancel = view.findViewById(R.id.button_cancel);
@@ -124,10 +126,6 @@ public class ChatFragment extends Fragment
         btnSend = view.findViewById(R.id.btn_send);
         sendSeparator = view.findViewById(R.id.send_separator);
         sendImage = view.findViewById(R.id.send_button);
-        etMessage.setVisibility(View.INVISIBLE);
-        btnSend.setVisibility(View.INVISIBLE);
-        sendSeparator.setVisibility(View.INVISIBLE);
-        sendImage.setVisibility(View.INVISIBLE);
     }
 
     private void setupRecycler() {
@@ -184,8 +182,10 @@ public class ChatFragment extends Fragment
 
     @Override
     public void hideLoader() {
-        viewLoad.setVisibility(View.GONE);
-        loadingConnectionText.setVisibility(View.GONE);
+        btnCancel.setVisibility(View.INVISIBLE);
+        progresBar.setVisibility(View.INVISIBLE);
+        viewLoad.setVisibility(View.INVISIBLE);
+        loadingConnectionText.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -209,6 +209,22 @@ public class ChatFragment extends Fragment
         Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setSubtitle(subtitle);
     }
 
+    @Override
+    public void hideSendPanel() {
+        etMessage.setVisibility(View.INVISIBLE);
+        btnSend.setVisibility(View.INVISIBLE);
+        sendSeparator.setVisibility(View.INVISIBLE);
+        sendImage.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void showSendPanel() {
+        etMessage.setVisibility(View.VISIBLE);
+        btnSend.setVisibility(View.VISIBLE);
+        sendSeparator.setVisibility(View.VISIBLE);
+        sendImage.setVisibility(View.VISIBLE);
+    }
+
     private void initListeners() {
         peerListListener = new WifiP2pManager.PeerListListener() {
             @Override
@@ -227,10 +243,7 @@ public class ChatFragment extends Fragment
                     manager.connect(channel, config, new WifiP2pManager.ActionListener() {
                         @Override
                         public void onSuccess() {
-                            etMessage.setVisibility(View.VISIBLE);
-                            btnSend.setVisibility(View.VISIBLE);
-                            sendSeparator.setVisibility(View.VISIBLE);
-                            sendImage.setVisibility(View.VISIBLE);
+
                         }
 
                         @Override

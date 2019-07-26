@@ -29,6 +29,7 @@ public class ChatPresenter implements ChatContractor.Presenter {
         view.hideLoader();
         Date time;
         if (isHistory) {
+            view.hideSendPanel();
             view.hideLoader();
             ChatModel chatModel = DataManager.getChatById(chatId);
             deviceName = chatModel.getDeviceName();
@@ -36,6 +37,7 @@ public class ChatPresenter implements ChatContractor.Presenter {
             data = DataManager.getChatMessages(chatId);
             view.draw(data);
         } else {
+            view.showSendPanel();
             time = new Date();
             ChatModel chatModel = DataManager.updateChat(new ChatModel(0, deviceName, time, 0));
             chatId = chatModel.getId();

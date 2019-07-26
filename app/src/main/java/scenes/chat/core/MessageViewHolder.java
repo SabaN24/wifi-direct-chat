@@ -9,12 +9,17 @@ import com.saba.wifidirectchat.R;
 
 public class MessageViewHolder extends RecyclerView.ViewHolder {
 
-    public TextView message;
-    public TextView date;
+    public TextView messageLeft;
+    public TextView messageRight;
+    public TextView dateLeft;
+    public TextView dateRight;
 
     public MessageViewHolder(@NonNull View itemView) {
         super(itemView);
-        message = itemView.findViewById(R.id.chat_message);
-        date = itemView.findViewById(R.id.chat_message_date);
+        messageLeft = itemView.findViewById(R.id.chat_message_left);
+        messageRight = itemView.findViewById(R.id.chat_message_right);
+        dateRight = itemView.findViewById(R.id.chat_right_message_date);
+        dateLeft = itemView.findViewById(R.id.chat_left_message_date);
     }
+
 }

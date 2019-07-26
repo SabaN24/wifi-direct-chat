@@ -6,31 +6,60 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/chat_message"
+        android:id="@+id/chat_message_right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="4dp"
-        android:padding="8dp"
-        android:textColor="#FFFFFF"
         android:background="@drawable/message_shape"
+        android:inputType="textMultiLine"
+        android:maxWidth="300dp"
+        android:padding="8dp"
         android:text="@string/empty"
+        android:textColor="#FFFFFF"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/chat_message_date"
+        app:layout_constraintBottom_toTopOf="@+id/chat_right_message_date"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
-        android:id="@+id/chat_message_date"
+        android:id="@+id/chat_message_left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/message_shape"
+        android:inputType="textMultiLine"
+        android:maxWidth="300dp"
+        android:padding="8dp"
+        android:text="@string/empty"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/chat_right_message_date"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/chat_right_message_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
         android:text="@string/empty"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/chat_message"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/chat_message" />
+        app:layout_constraintEnd_toEndOf="@+id/chat_message_right" />
+
+    <TextView
+        android:id="@+id/chat_left_message_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/empty"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/chat_message_left"
+        app:layout_constraintTop_toBottomOf="@+id/chat_message_left" />
 </android.support.constraint.ConstraintLayout>

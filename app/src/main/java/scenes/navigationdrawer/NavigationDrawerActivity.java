@@ -42,12 +42,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         presenter.start();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return false;
-    }
-
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
