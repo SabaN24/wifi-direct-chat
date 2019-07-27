@@ -80,6 +80,7 @@ public class ChatFragment extends Fragment
     private Client client;
     private Pipe pipe;
     private String connectedDeviceName;
+    private List<Thread> threads = new ArrayList<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -137,12 +138,23 @@ public class ChatFragment extends Fragment
             p2pManager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
                 @Override
                 public void onGroupInfoAvailable(WifiP2pGroup group) {
-                    if (group != null && p2pManager != null && channel != null
-                            && group.isGroupOwner()) {
+                    if (group != null && p2pManager != null && channel != null) {
                         p2pManager.removeGroup(channel, null);
                     }
                 }
             });
+        }
+        try {
+            for (Thread t : threads) {
+                if (t instanceof Server) {
+                    ((Server) t).getServerSocket().close();
+                    ((Server) t).getSocket().close();
+                } else if (t instanceof Client) {
+                    ((Client) t).getSocket().close();
+                }
+                t.stop();
+            }
+        } catch (Exception ignored) {
         }
     }
 
@@ -302,11 +314,16 @@ public class ChatFragment extends Fragment
                         WifiP2pConfig config = new WifiP2pConfig();
                         config.deviceAddress = device.deviceAddress;
 
+                        try {
+                            Thread.sleep(7000);
+                        } catch (InterruptedException ignored) {
+                        }
+
                         p2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
                             @Override
                             public void onSuccess() {
                                 connectedDeviceName = device.deviceName;
-                                presenter.createNewChat(connectedDeviceName);
+                                setTitle(connectedDeviceName);
                             }
 
                             @Override
@@ -327,11 +344,14 @@ public class ChatFragment extends Fragment
                     if (info.isGroupOwner) {
                         server = new Server();
                         server.start();
+                        threads.add(server);
                     } else {
                         client = new Client(groupOwner.getHostAddress());
                         client.start();
+                        threads.add(client);
                     }
                     hideLoader();
+                    presenter.createNewChat(connectedDeviceName);
                 }
             }
         };
@@ -375,12 +395,21 @@ public class ChatFragment extends Fragment
         private Socket socket;
         private ServerSocket serverSocket;
 
+        Socket getSocket() {
+            return socket;
+        }
+
+        ServerSocket getServerSocket() {
+            return serverSocket;
+        }
+
         @Override
         public void run() {
             try {
                 serverSocket = new ServerSocket(ConnectionConstants.PORT);
                 socket = serverSocket.accept();
                 pipe = new Pipe(socket);
+                threads.add(pipe);
                 pipe.start();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -398,11 +427,16 @@ public class ChatFragment extends Fragment
             this.socket = new Socket();
         }
 
+        Socket getSocket() {
+            return socket;
+        }
+
         @Override
         public void run() {
             try {
                 socket.connect(new InetSocketAddress(hostAddress, ConnectionConstants.PORT), ConnectionConstants.TIMEOUT);
                 pipe = new Pipe(socket);
+                threads.add(pipe);
                 pipe.start();
             } catch (IOException e) {
                 e.printStackTrace();

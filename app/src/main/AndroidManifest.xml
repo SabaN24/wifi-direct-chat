@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.INTERNET" android:required="true" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" android:required="true" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:required="true" />
-    <uses-feature android:name="android.hardware.wifi.direct" android:required="true" />
 
     <application
         android:name="app.App"

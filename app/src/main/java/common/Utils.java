@@ -5,6 +5,6 @@ import java.util.Locale;
 
 public class Utils {
 
-    public static final SimpleDateFormat SDF = new SimpleDateFormat("dd-MM-yyyy - hh:mm:ss", Locale.US);
+    public static final SimpleDateFormat SDF = new SimpleDateFormat("dd-MM-yyyy - HH:mm:ss", Locale.US);
 
 }
