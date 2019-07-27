@@ -6,6 +6,7 @@ import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
@@ -126,6 +127,22 @@ public class ChatFragment extends Fragment
         super.onPause();
         if (receiver != null) {
             getActivity().unregisterReceiver(receiver);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (p2pManager != null && channel != null) {
+            p2pManager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
+                @Override
+                public void onGroupInfoAvailable(WifiP2pGroup group) {
+                    if (group != null && p2pManager != null && channel != null
+                            && group.isGroupOwner()) {
+                        p2pManager.removeGroup(channel, null);
+                    }
+                }
+            });
         }
     }
 
@@ -289,8 +306,7 @@ public class ChatFragment extends Fragment
                             @Override
                             public void onSuccess() {
                                 connectedDeviceName = device.deviceName;
-                                hideLoader();
-                                presenter.createNewChat(device.deviceName);
+                                presenter.createNewChat(connectedDeviceName);
                             }
 
                             @Override
@@ -315,6 +331,7 @@ public class ChatFragment extends Fragment
                         client = new Client(groupOwner.getHostAddress());
                         client.start();
                     }
+                    hideLoader();
                 }
             }
         };
