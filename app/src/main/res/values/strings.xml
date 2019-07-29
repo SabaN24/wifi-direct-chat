@@ -12,7 +12,7 @@
     <string name="chat">ჩატი</string>
     <string name="empty">---</string>
     <string name="clearHistory">ისტორიის გასუფთავება</string>
-    <string name="confirmDeleteChat">გსურთ \'%1$s\'-თან მიმოწერის წაშლა?</string>
+    <string name="confirmDeleteChat">გსურთ %1$s-თან მიმოწერის წაშლა?</string>
     <string name="confirmDeleteThisChat">გსურთ ამ მიმოწერის წაშლა?</string>
     <string name="yes">დიახ</string>
     <string name="no">არა</string>
@@ -20,4 +20,5 @@
     <string name="loading_connection">Loading connection…</string>
     <string name="noChatsFound">ისტორია არ მოიძებნა</string>
     <string name="delete">წაშლა</string>
+    <string name="connectingTo">დაკავშირება %1$s-თან</string>
 </resources>

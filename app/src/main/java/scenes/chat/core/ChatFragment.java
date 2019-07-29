@@ -247,6 +247,7 @@ public class ChatFragment extends Fragment
 
     @Override
     public void moveBack() {
+        setSubtitle("");
         Fragment fragment = new HistoryFragment();
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -293,7 +294,6 @@ public class ChatFragment extends Fragment
         btnSend.setVisibility(View.VISIBLE);
         sendSeparator.setVisibility(View.VISIBLE);
         sendImage.setVisibility(View.VISIBLE);
-
         setTitle(deviceName);
         setSubtitle(Utils.SDF.format(time));
     }
@@ -314,16 +314,11 @@ public class ChatFragment extends Fragment
                         WifiP2pConfig config = new WifiP2pConfig();
                         config.deviceAddress = device.deviceAddress;
 
-                        try {
-                            Thread.sleep(7000);
-                        } catch (InterruptedException ignored) {
-                        }
-
                         p2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
                             @Override
                             public void onSuccess() {
                                 connectedDeviceName = device.deviceName;
-                                setTitle(connectedDeviceName);
+                                setTitle(String.format(getString(R.string.connectingTo), connectedDeviceName));
                             }
 
                             @Override
