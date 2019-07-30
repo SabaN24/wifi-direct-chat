@@ -6,7 +6,6 @@ import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
-import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
@@ -135,14 +134,7 @@ public class ChatFragment extends Fragment
     public void onDestroy() {
         super.onDestroy();
         if (p2pManager != null && channel != null) {
-            p2pManager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
-                @Override
-                public void onGroupInfoAvailable(WifiP2pGroup group) {
-                    if (group != null && p2pManager != null && channel != null) {
-                        p2pManager.removeGroup(channel, null);
-                    }
-                }
-            });
+            p2pManager.removeGroup(channel, null);
         }
         try {
             for (Thread t : threads) {
@@ -234,7 +226,9 @@ public class ChatFragment extends Fragment
 
     @Override
     public void sendMessage(final String text) {
-        pipe.write(text.getBytes());
+        if (pipe != null) {
+            pipe.write(text.getBytes());
+        }
     }
 
     @Override
@@ -461,7 +455,7 @@ public class ChatFragment extends Fragment
             byte[] buffer = new byte[1024];
             int bytes;
 
-            while (socket != null) {
+            while (socket != null && !socket.isClosed()) {
                 try {
                     bytes = inputStream.read(buffer);
                     if (bytes > 0) {
@@ -471,6 +465,7 @@ public class ChatFragment extends Fragment
                     e.printStackTrace();
                 }
             }
+            Thread.currentThread().interrupt();
         }
 
         void write(byte[] bytes) {
