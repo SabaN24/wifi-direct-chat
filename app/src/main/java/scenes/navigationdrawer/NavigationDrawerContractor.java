@@ -2,8 +2,9 @@ package scenes.navigationdrawer;
 
 public interface NavigationDrawerContractor {
     interface View {
-        void move2History();
+        void showHistoryScene();
         void move2Chat();
+        void closeDrawer();
     }
 
     interface Presenter {

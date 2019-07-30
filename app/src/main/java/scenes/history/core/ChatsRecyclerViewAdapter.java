@@ -2,6 +2,7 @@ package scenes.history.core;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -19,6 +20,7 @@ import com.saba.wifidirectchat.R;
 import java.util.List;
 
 import common.Utils;
+import scenes.chat.core.ChatActivity;
 import scenes.chat.core.ChatFragment;
 import scenes.history.model.ChatModel;
 
@@ -27,10 +29,12 @@ public class ChatsRecyclerViewAdapter extends RecyclerView.Adapter {
     private List<ChatModel> chats;
 
     private HistoryContractor.Presenter presenter;
+    private Context context;
 
     public ChatsRecyclerViewAdapter(Context context, HistoryContractor.Presenter presenter) {
         super();
         this.presenter = presenter;
+        this.context = context;
     }
 
     public void setChats(List<ChatModel> notes) {
@@ -52,16 +56,9 @@ public class ChatsRecyclerViewAdapter extends RecyclerView.Adapter {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment fragment = new ChatFragment();
-                Bundle args = new Bundle();
-                args.putInt("chatId", chat.getId());
-                fragment.setArguments(args);
-                FragmentManager fragmentManager = ((AppCompatActivity) v.getContext()).getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.scene, fragment);
-                fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                Intent intent = new Intent(context, ChatActivity.class);
+                intent.putExtra("chatId", chat.getId());
+                context.startActivity(intent);
             }
         });
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {

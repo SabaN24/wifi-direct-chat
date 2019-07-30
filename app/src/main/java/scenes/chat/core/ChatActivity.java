@@ -3,37 +3,35 @@ package scenes.chat.core;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toolbar;
-
 import com.saba.wifidirectchat.R;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,18 +43,13 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import common.Utils;
 import p2p.ConnectionConstants;
 import p2p.WiFiDirectBroadcastReceiver;
 import scenes.chat.model.MessageModel;
 import scenes.history.core.HistoryFragment;
 
-// TODO
-// Delete this fragment
-
-public class ChatFragment extends Fragment
-                          implements ChatContractor.View {
+public class ChatActivity extends AppCompatActivity implements ChatContractor.View {
 
     private RecyclerView recyclerView;
     private Button btnSend;
@@ -78,56 +71,48 @@ public class ChatFragment extends Fragment
     private WifiP2pManager.ConnectionInfoListener connectionInfoListener;
     private ChatAdapter adapter;
     private Handler handler;
-    private Server server;
-    private Client client;
-    private Pipe pipe;
+    private ChatActivity.Server server;
+    private ChatActivity.Client client;
+    private ChatActivity.Pipe pipe;
     private String connectedDeviceName;
     private List<Thread> threads = new ArrayList<>();
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_chat, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        setHasOptionsMenu(true);
-        setupUIElements(view);
-        Bundle bundle = this.getArguments();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_chat);
+        setupUIElements();
+        Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             int chatId = bundle.getInt("chatId", -1);
             presenter = new ChatPresenter(this, chatId);
         } else {
             presenter = new ChatPresenter(this, -1);
         }
-        setTitle(getString(R.string.chat));
         setupRecycler();
         setupBtnSendOnClickAction();
         setupBtnCancelOnClickAction();
         showBackButton();
+        setTitle(getString(R.string.chat));
         presenter.start();
     }
 
     private void showBackButton() {
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-
     @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        if (presenter != null) {
-            if (!presenter.isHistory()) {
-                menu.clear();
-            }
-        }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.chat_menu, menu);
+        return true;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         if (receiver != null) {
-            getActivity().registerReceiver(receiver, intentFilter);
+            registerReceiver(receiver, intentFilter);
         }
     }
 
@@ -135,7 +120,7 @@ public class ChatFragment extends Fragment
     public void onPause() {
         super.onPause();
         if (receiver != null) {
-            getActivity().unregisterReceiver(receiver);
+            unregisterReceiver(receiver);
         }
     }
 
@@ -147,11 +132,11 @@ public class ChatFragment extends Fragment
         }
         try {
             for (Thread t : threads) {
-                if (t instanceof Server) {
-                    ((Server) t).getServerSocket().close();
-                    ((Server) t).getSocket().close();
-                } else if (t instanceof Client) {
-                    ((Client) t).getSocket().close();
+                if (t instanceof ChatActivity.Server) {
+                    ((ChatActivity.Server) t).getServerSocket().close();
+                    ((ChatActivity.Server) t).getSocket().close();
+                } else if (t instanceof ChatActivity.Client) {
+                    ((ChatActivity.Client) t).getSocket().close();
                 }
                 t.stop();
             }
@@ -161,35 +146,39 @@ public class ChatFragment extends Fragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        new AlertDialog.Builder(getActivity())
-                .setTitle(getActivity().getResources().getString(R.string.confirm))
-                .setMessage(getString(R.string.confirmDeleteThisChat))
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(getActivity().getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        presenter.btnDeleteTapped();
-                    }
-                })
-                .setNegativeButton(getActivity().getResources().getString(R.string.no), null).show();
+        if(item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        } else {
+            new AlertDialog.Builder(this)
+                    .setTitle(getResources().getString(R.string.confirm))
+                    .setMessage(getString(R.string.confirmDeleteThisChat))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            presenter.btnDeleteTapped();
+                        }
+                    })
+                    .setNegativeButton(getResources().getString(R.string.no), null).show();
+        }
         return true;
     }
 
-    private void setupUIElements(View view) {
-        progressBar = view.findViewById(R.id.progress_bar);
-        viewLoad = view.findViewById(R.id.view_load);
-        loadingConnectionText = view.findViewById(R.id.loading_connection_text);
-        btnCancel = view.findViewById(R.id.button_cancel);
-        recyclerView = view.findViewById(R.id.recycler_chat);
-        etMessage = view.findViewById(R.id.et_message);
-        btnSend = view.findViewById(R.id.btn_send);
-        sendSeparator = view.findViewById(R.id.send_separator);
-        sendImage = view.findViewById(R.id.send_button);
+    private void setupUIElements() {
+        progressBar = findViewById(R.id.progress_bar);
+        viewLoad = findViewById(R.id.view_load);
+        loadingConnectionText = findViewById(R.id.loading_connection_text);
+        btnCancel = findViewById(R.id.button_cancel);
+        recyclerView = findViewById(R.id.recycler_chat);
+        etMessage = findViewById(R.id.et_message);
+        btnSend = findViewById(R.id.btn_send);
+        sendSeparator = findViewById(R.id.send_separator);
+        sendImage = findViewById(R.id.send_button);
 
         etMessage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (v.getId() == R.id.et_message && !hasFocus) {
-                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
                 }
@@ -199,7 +188,7 @@ public class ChatFragment extends Fragment
 
     private void setupRecycler() {
         adapter = new ChatAdapter();
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
     }
 
@@ -249,24 +238,17 @@ public class ChatFragment extends Fragment
 
     @Override
     public void moveBack() {
-        setSubtitle("");
-        Fragment fragment = new HistoryFragment();
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.scene, fragment);
-        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        onBackPressed();
     }
 
     @Override
     public void setTitle(String title) {
-        Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setTitle(title);
+        getSupportActionBar().setTitle(title);
     }
 
     @Override
     public void setSubtitle(String subtitle) {
-        Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setSubtitle(subtitle);
+        getSupportActionBar().setSubtitle(subtitle);
     }
 
     @Override
@@ -280,14 +262,14 @@ public class ChatFragment extends Fragment
     @Override
     public void searchForPeers() {
         initListeners();
-        p2pManager = (WifiP2pManager) getActivity().getSystemService(Context.WIFI_P2P_SERVICE);
-        channel = p2pManager.initialize(getActivity(), getActivity().getMainLooper(), null);
+        p2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        channel = p2pManager.initialize(this, getMainLooper(), null);
         receiver = new WiFiDirectBroadcastReceiver(p2pManager, channel, peerListListener, connectionInfoListener);
 
         initIntentFilter();
         discoverPeers();
 
-        getActivity().registerReceiver(receiver, intentFilter);
+        registerReceiver(receiver, intentFilter);
     }
 
     @Override
@@ -339,11 +321,11 @@ public class ChatFragment extends Fragment
                 final InetAddress groupOwner = info.groupOwnerAddress;
                 if (info.groupFormed) {
                     if (info.isGroupOwner) {
-                        server = new Server();
+                        server = new ChatActivity.Server();
                         server.start();
                         threads.add(server);
                     } else {
-                        client = new Client(groupOwner.getHostAddress());
+                        client = new ChatActivity.Client(groupOwner.getHostAddress());
                         client.start();
                         threads.add(client);
                     }
@@ -405,7 +387,7 @@ public class ChatFragment extends Fragment
             try {
                 serverSocket = new ServerSocket(ConnectionConstants.PORT);
                 socket = serverSocket.accept();
-                pipe = new Pipe(socket);
+                pipe = new ChatActivity.Pipe(socket);
                 threads.add(pipe);
                 pipe.start();
             } catch (IOException e) {
@@ -432,7 +414,7 @@ public class ChatFragment extends Fragment
         public void run() {
             try {
                 socket.connect(new InetSocketAddress(hostAddress, ConnectionConstants.PORT), ConnectionConstants.TIMEOUT);
-                pipe = new Pipe(socket);
+                pipe = new ChatActivity.Pipe(socket);
                 threads.add(pipe);
                 pipe.start();
             } catch (IOException e) {
@@ -485,6 +467,4 @@ public class ChatFragment extends Fragment
         }
 
     }
-
-
 }

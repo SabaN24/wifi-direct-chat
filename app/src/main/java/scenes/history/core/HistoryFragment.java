@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -57,6 +58,12 @@ public class HistoryFragment extends Fragment
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         menu.clear();
+    }
+
+    @Override
+    public void onResume() {
+        presenter.onResume();
+        super.onResume();
     }
 
     @Override

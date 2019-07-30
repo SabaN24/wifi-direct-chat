@@ -11,6 +11,7 @@ public interface HistoryContractor {
 
     interface Presenter {
         void start();
+        void onResume();
         void clearHistoryButtonClicked();
         void removeChatButtonClicked(int id);
     }

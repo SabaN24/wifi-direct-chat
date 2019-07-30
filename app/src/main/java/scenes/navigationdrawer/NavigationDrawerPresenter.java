@@ -10,16 +10,15 @@ public class NavigationDrawerPresenter implements NavigationDrawerContractor.Pre
 
     @Override
     public void start() {
-        view.move2History();
+        view.showHistoryScene();
     }
 
     @Override
-    public void historyTapped() {
-        view.move2History();
-    }
+    public void historyTapped() { view.closeDrawer(); }
 
     @Override
     public void chatTapped() {
+        view.closeDrawer();
         view.move2Chat();
     }
 }

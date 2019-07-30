@@ -19,6 +19,11 @@ public class HistoryPresenter implements HistoryContractor.Presenter {
     }
 
     @Override
+    public void onResume() {
+        view.drawChats(DataManager.getAllChats());
+    }
+
+    @Override
     public void clearHistoryButtonClicked() {
         DataManager.deleteAllChats();
         view.drawChats(new ArrayList<ChatModel>());
