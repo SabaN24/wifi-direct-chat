@@ -39,17 +39,7 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
         messageViewHolder.dateRight.setVisibility(View.INVISIBLE);
         final String date = Utils.SDF.format(data.get(i).getTime());
         if(model.isResponse()) {
-            messageViewHolder.messageLeft.setVisibility(View.INVISIBLE);
-            messageViewHolder.messageRight.setText(data.get(i).getText());
-            messageViewHolder.messageRight.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    messageViewHolder.dateRight.setText(date);
-                    messageViewHolder.dateRight.setVisibility(View.INVISIBLE);
-                    return false;
-                }
-            });
-        } else {
+            messageViewHolder.messageLeft.setVisibility(View.VISIBLE);
             messageViewHolder.messageRight.setVisibility(View.INVISIBLE);
             messageViewHolder.messageLeft.setText(data.get(i).getText());
             messageViewHolder.messageLeft.setOnLongClickListener(new View.OnLongClickListener() {
@@ -57,6 +47,18 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
                 public boolean onLongClick(View v) {
                     messageViewHolder.dateLeft.setText(date);
                     messageViewHolder.dateLeft.setVisibility(View.VISIBLE);
+                    return false;
+                }
+            });
+        } else {
+            messageViewHolder.messageLeft.setVisibility(View.INVISIBLE);
+            messageViewHolder.messageRight.setVisibility(View.VISIBLE);
+            messageViewHolder.messageRight.setText(data.get(i).getText());
+            messageViewHolder.messageRight.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    messageViewHolder.dateRight.setText(date);
+                    messageViewHolder.dateRight.setVisibility(View.VISIBLE);
                     return false;
                 }
             });

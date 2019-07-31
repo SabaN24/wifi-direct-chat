@@ -9,11 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.saba.wifidirectchat.R;
-
 import java.util.List;
-
 import common.Utils;
 import scenes.chat.core.ChatActivity;
 import scenes.history.model.ChatModel;

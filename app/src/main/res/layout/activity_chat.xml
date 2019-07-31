@@ -4,9 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     tools:context="scenes.chat.core.ChatActivity">
 
     <android.support.v7.widget.RecyclerView
+        android:windowSoftInputMode="stateVisible|adjustResize"
         android:id="@+id/recycler_chat"
         android:layout_width="0dp"
         android:layout_height="0dp"
