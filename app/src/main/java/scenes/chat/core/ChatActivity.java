@@ -3,7 +3,6 @@ package scenes.chat.core;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
-import android.graphics.drawable.Drawable;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
@@ -11,17 +10,11 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,7 +25,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.saba.wifidirectchat.R;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -43,11 +38,11 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import common.Utils;
 import p2p.ConnectionConstants;
 import p2p.WiFiDirectBroadcastReceiver;
 import scenes.chat.model.MessageModel;
-import scenes.history.core.HistoryFragment;
 
 public class ChatActivity extends AppCompatActivity implements ChatContractor.View {
 
@@ -138,15 +133,21 @@ public class ChatActivity extends AppCompatActivity implements ChatContractor.Vi
                 } else if (t instanceof ChatActivity.Client) {
                     ((ChatActivity.Client) t).getSocket().close();
                 }
-                t.stop();
+                t.interrupt();
             }
         } catch (Exception ignored) {
+        } finally {
+            for (Thread t : threads) {
+                if (!t.isInterrupted()) {
+                    t.interrupt();
+                }
+            }
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == android.R.id.home) {
             onBackPressed();
         } else {
             new AlertDialog.Builder(this)
@@ -445,7 +446,13 @@ public class ChatActivity extends AppCompatActivity implements ChatContractor.Vi
             byte[] buffer = new byte[1024];
             int bytes;
 
-            while (socket != null && !socket.isClosed()) {
+            while (socket != null) {
+                if (Thread.interrupted()) {
+                    break;
+                }
+                if (socket.isClosed()) {
+                    Thread.currentThread().interrupt();
+                }
                 try {
                     bytes = inputStream.read(buffer);
                     if (bytes > 0) {
@@ -455,7 +462,6 @@ public class ChatActivity extends AppCompatActivity implements ChatContractor.Vi
                     e.printStackTrace();
                 }
             }
-            Thread.currentThread().interrupt();
         }
 
         void write(byte[] bytes) {
