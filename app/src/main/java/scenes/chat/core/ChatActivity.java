@@ -218,6 +218,7 @@ public class ChatActivity extends AppCompatActivity implements ChatContractor.Vi
         recyclerView.smoothScrollToPosition(adapter.getItemCount());
     }
 
+
     @Override
     public void clearInput() {
         etMessage.setText("");
