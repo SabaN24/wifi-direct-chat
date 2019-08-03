@@ -215,6 +215,7 @@ public class ChatActivity extends AppCompatActivity implements ChatContractor.Vi
     public void draw(List<MessageModel> data) {
         adapter.setData(data);
         adapter.notifyDataSetChanged();
+        recyclerView.smoothScrollToPosition(adapter.getItemCount());
     }
 
     @Override
