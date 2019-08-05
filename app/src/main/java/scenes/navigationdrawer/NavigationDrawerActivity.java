@@ -65,7 +65,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     @Override
     public void showHistoryScene() {
-        Fragment fragment = new HistoryFragment(); // TODO (Levan)
+        Fragment fragment = HistoryFragment.newInstance();
         final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.scene, fragment);
         transaction.addToBackStack(fragment.getClass().toString());

@@ -24,12 +24,14 @@ public class HistoryFragment extends Fragment
         implements HistoryContractor.View {
 
     private HistoryContractor.Presenter presenter;
-
     private RecyclerView chatsRecyclerView;
-
     private ChatsRecyclerViewAdapter chatsRecyclerViewAdapter;
-
     private View view;
+
+    public static HistoryFragment newInstance() {
+        HistoryFragment historyFragment = new HistoryFragment();
+        return historyFragment;
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
