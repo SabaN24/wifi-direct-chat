@@ -71,6 +71,7 @@ public class ChatActivity extends AppCompatActivity implements ChatContractor.Vi
     private ChatActivity.Pipe pipe;
     private String connectedDeviceName;
     private List<Thread> threads = new ArrayList<>();
+    private boolean showBtnDlete = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +81,7 @@ public class ChatActivity extends AppCompatActivity implements ChatContractor.Vi
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             int chatId = bundle.getInt("chatId", -1);
+            showBtnDlete = true;
             presenter = new ChatPresenter(this, chatId);
         } else {
             presenter = new ChatPresenter(this, -1);
@@ -100,6 +102,7 @@ public class ChatActivity extends AppCompatActivity implements ChatContractor.Vi
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.chat_menu, menu);
+        menu.findItem(R.id.action_delete).setVisible(showBtnDlete);
         return true;
     }
 
